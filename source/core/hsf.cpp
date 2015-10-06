@@ -57,6 +57,7 @@ HsfGetDirectoryEntry(hsf *HSF, const char *FileName)
 
     while (IndexCurrent < IndexMax)
     {
+        if (RE->Length == 0) break;
         if (strncmp(RE->FileName, FileName, strlen(FileName)) == 0)
         {
             memmove(Buffer, RE, RE->Length);
