@@ -30,9 +30,9 @@ INCLUDES	:=	include raw_data
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
-ARCH	:= -m32
+ARCH	:= -mmacosx-version-min=10.9
 
-CFLAGS	:=	 -g -Wall -O2  -Wno-format -m32 \
+CFLAGS	:=	 -g -Wall -O2  -Wno-format \
 			-fno-omit-frame-pointer -ffast-math \
 			$(ARCH)
 
@@ -41,7 +41,7 @@ CFLAGS	+=	$(INCLUDE) -D_DESKTOP $(shell pkg-config --cflags glfw3)
 CXXFLAGS	:= -std=c++11 $(CFLAGS) -fno-rtti -fno-exceptions
 
 ASFLAGS	:=	-g $(ARCH)
-LDFLAGS	= -g $(ARCH) -Wl
+LDFLAGS	= -g $(ARCH) -framework OpenGL -Wl
 
 LIBS	:=  $(shell pkg-config glfw3 --static --libs) -lm
 

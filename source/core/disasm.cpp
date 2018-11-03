@@ -6,8 +6,8 @@
  * this stuff is worth it, you can buy me a beer in return.   Josh Huelsman
  * ----------------------------------------------------------------------------
  */
-#include <cstdio>
-#include <cstdlib>
+#include <stdio.h>
+#include <stdlib.h>
 #include "mips.h"
 #include "disasm.h"
 

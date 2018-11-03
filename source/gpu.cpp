@@ -9,7 +9,7 @@
 #include "gpu.h"
 #include "platform.h"
 
-#include <cstdio>
+#include <stdio.h>
 
 static void
 GteExecuteOperation(Coprocessor *Cp, u32 FunctionCode)
@@ -17,7 +17,7 @@ GteExecuteOperation(Coprocessor *Cp, u32 FunctionCode)
 
 }
 
-#include <cstring>
+#include <string.h>
 
 GPU::
 GPU()

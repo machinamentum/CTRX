@@ -6,7 +6,7 @@
  * this stuff is worth it, you can buy me a beer in return.   Josh Huelsman
  * ----------------------------------------------------------------------------
  */
-#include <cstring>
+#include <string.h>
 #include "hsf.h"
 
 void

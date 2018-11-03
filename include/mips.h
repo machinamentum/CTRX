@@ -251,7 +251,7 @@ void StepCpu(MIPS_R3000 *Cpu, u32 Steps);
 void C0GenerateException(MIPS_R3000 *, u8, u32);
 
 inline void *
-MapVirtualAddress(MIPS_R3000 *Cpu, u32 Address)
+MapVirtualAddress(MIPS_R3000 *Cpu, memptr_t Address)
 {
     const u32 BIOS_SIZE = 512 * 1000;
     const u32 RAM_SIZE = 2048 * 1000;

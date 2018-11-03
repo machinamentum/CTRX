@@ -10,7 +10,7 @@
 #define HSF_H
 
 #include "platform.h"
-#include <cstdio>
+#include <stdio.h>
 
 #define HSF_SECTOR_SIZE 2048
 

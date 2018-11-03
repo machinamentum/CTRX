@@ -7,9 +7,9 @@
  * ----------------------------------------------------------------------------
  */
 #include "platform.h"
-#include <cstdio>
+#include <stdio.h>
 #include <stdlib.h>
-#include <cstring>
+#include <string.h>
 #include "mips.h"
 #include "gpu.h"
 #include "disasm.h"
@@ -128,7 +128,7 @@ CTRXFileSeekReturn(void *Ref, u32 Address)
 }
 
 static void
-CTRXFirstFile(void *Ref, u32 Ptr)
+CTRXFirstFile(void *Ref, memptr_t Ptr)
 {
     MIPS_R3000 *Cpu = (MIPS_R3000 *)Ref;
 
@@ -144,13 +144,13 @@ CTRXFirstFile(void *Ref, u32 Ptr)
 
     struct FFInfo
     {
-        char *FileName;
+        memptr_t FileName;
         u32 Entry;
     } *FFInfoPtr;
 
     FFInfoPtr = (FFInfo *)MapVirtualAddress(Cpu, Ptr);
     DirEntry *Entry = (DirEntry *)MapVirtualAddress(Cpu, FFInfoPtr->Entry);
-    snprintf(Entry->FileName, 0x14, "%s", (char *)MapVirtualAddress(Cpu, (u32)FFInfoPtr->FileName));
+    snprintf(Entry->FileName, 0x14, "%s", (char *)MapVirtualAddress(Cpu, FFInfoPtr->FileName));
 
     printf("CTRX filefile: %s\n", Entry->FileName);
 

@@ -12,7 +12,9 @@
 #ifdef _3DS
 #include <3ds.h>
 #include <3ds/types.h>
+
 #else
+
 #include <stdint.h>
 
 typedef uint64_t u64;
@@ -25,10 +27,13 @@ typedef int32_t s32;
 typedef int16_t s16;
 typedef int8_t  s8;
 
-#include <cstdlib>
+#include <stdlib.h>
 #define linearAlloc malloc
 #define linearFree free
-#endif
+
+#endif // _3DS
+
+typedef u32 memptr_t;
 
 void InitPlatform(int, char **);
 void ExitPlatform();
