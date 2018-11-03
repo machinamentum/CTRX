@@ -17,27 +17,19 @@
 #include "joypad.h"
 #include "hsf.h"
 
-void
-ResetCpu(MIPS_R3000 *Cpu)
-{
+void ResetCpu(MIPS_R3000 *Cpu) {
     Cpu->pc = RESET_VECTOR;
 }
 
-static void
-std_out_putchar(void *Ref, u32 Value)
-{
+static void std_out_putchar(void *Ref, u32 Value) {
     putchar(Value);
 }
 
-static u32
-empty_ret(void *Obj, u32 Val)
-{
+static u32 empty_ret(void *Obj, u32 Val) {
     return 0;
 }
 
-static void
-empty_write(void *Obj, u32 Address)
-{
+static void empty_write(void *Obj, u32 Address) {
 
 }
 
@@ -46,12 +38,10 @@ static hsf_file *FilePtrs[15];
 static int TakenFiles[15] = {};
 static int ReturnFile = 0;
 static int ReturnRead = 0;
-static int ReturnSeek = 0;
-static int ReturnFirstFile = 0;
+static u32 ReturnSeek = 0;
+static memptr_t ReturnFirstFile = 0;
 
-static void
-CTRXFileOpen(void *Ref, u32 Ptr)
-{
+static void CTRXFileOpen(void *Ref, u32 Ptr) {
     char *FileName = (char *)MapVirtualAddress((MIPS_R3000 *)Ref, Ptr);
     int FreeFile = -1;
     for (int i = 2; i < 15; ++i)
@@ -62,12 +52,10 @@ CTRXFileOpen(void *Ref, u32 Ptr)
         }
     }
 
-    if (FreeFile > 1)
-    {
+    if (FreeFile > 1) {
         printf("CTRX: Opening file %s\n", FileName);
         FilePtrs[FreeFile] = HsfFileOpen(&HSF, FileName);
-        if (!FilePtrs[FreeFile]->DirectoryEntry)
-        {
+        if (!FilePtrs[FreeFile]->DirectoryEntry) {
             printf("Error opening file: %s\n", FileName);
             ReturnFile = -1;
             return;
@@ -79,86 +67,68 @@ CTRXFileOpen(void *Ref, u32 Ptr)
     ReturnFile = FreeFile;
 }
 
-static u32
-CTRXFileOpenReturn(void *Ref, u32 Address)
-{
+static u32 CTRXFileOpenReturn(void *Ref, u32 Address) {
     return ReturnFile;
 }
 
-static void
-CTRXFileRead(void *Ref, u32 Ptr)
-{
+static void CTRXFileRead(void *Ref, u32 Ptr) {
     MIPS_R3000 *Cpu = (MIPS_R3000 *)Ref;
-    struct FReadInfo
-    {
-        int Fd;
-        int Dst;
-        int Length;
-    } *FReadInfoPtr;
-    FReadInfoPtr = (FReadInfo *)MapVirtualAddress(Cpu, Ptr);
+    struct FReadInfo {
+        s32 Fd;
+        s32 Dst;
+        s32 Length;
+    };
+    FReadInfo *FReadInfoPtr = (FReadInfo *)MapVirtualAddress(Cpu, Ptr);
     ReturnRead = FReadInfoPtr->Length;
     HsfFileRead(MapVirtualAddress(Cpu, FReadInfoPtr->Dst), 1, FReadInfoPtr->Length, FilePtrs[FReadInfoPtr->Fd]);
 }
 
-static u32
-CTRXFileReadReturn(void *Ref, u32 Address)
-{
+static u32 CTRXFileReadReturn(void *Ref, u32 Address) {
     return ReturnRead;
 }
 
-static void
-CTRXFileSeek(void *Ref, u32 Ptr)
-{
+static void CTRXFileSeek(void *Ref, u32 Ptr) {
     MIPS_R3000 *Cpu = (MIPS_R3000 *)Ref;
-    struct FSeekInfo
-    {
-        int Fd;
-        int Offset;
-        int SeekType;
-    } *FSeekInfoPtr;
-    FSeekInfoPtr = (FSeekInfo *)MapVirtualAddress(Cpu, Ptr);
+    struct FSeekInfo {
+        s32 Fd;
+        s32 Offset;
+        s32 SeekType;
+    };
+    FSeekInfo *FSeekInfoPtr = (FSeekInfo *)MapVirtualAddress(Cpu, Ptr);
     HsfFileSeek(FilePtrs[FSeekInfoPtr->Fd], FSeekInfoPtr->Offset, FSeekInfoPtr->SeekType);
     ReturnSeek = HsfFileTell(FilePtrs[FSeekInfoPtr->Fd]);
 }
 
-static u32
-CTRXFileSeekReturn(void *Ref, u32 Address)
-{
+static u32 CTRXFileSeekReturn(void *Ref, u32 Address) {
     return ReturnSeek;
 }
 
-static void
-CTRXFirstFile(void *Ref, memptr_t Ptr)
-{
+static void CTRXFirstFile(void *Ref, memptr_t Ptr) {
     MIPS_R3000 *Cpu = (MIPS_R3000 *)Ref;
 
-    struct DirEntry
-    {
+    struct DirEntry {
         char FileName[0x14];
-        int Attribute;
-        int Size;
+        s32 Attribute;
+        s32 Size;
         void *Next;
-        int SelectorNumber;
-        int Reserved;
+        s32 SelectorNumber;
+        s32 Reserved;
     };
 
-    struct FFInfo
-    {
+    struct FFInfo {
         memptr_t FileName;
-        u32 Entry;
-    } *FFInfoPtr;
+        memptr_t Entry;
+    };
 
-    FFInfoPtr = (FFInfo *)MapVirtualAddress(Cpu, Ptr);
+    FFInfo *FFInfoPtr = (FFInfo *)MapVirtualAddress(Cpu, Ptr);
     DirEntry *Entry = (DirEntry *)MapVirtualAddress(Cpu, FFInfoPtr->Entry);
     snprintf(Entry->FileName, 0x14, "%s", (char *)MapVirtualAddress(Cpu, FFInfoPtr->FileName));
 
     printf("CTRX filefile: %s\n", Entry->FileName);
 
-    auto GetFileSize = [](const char *FileName)
-    {
+    auto GetFileSize = [](const char *FileName) {
         hsf_file *f = HsfFileOpen(&HSF, FileName);
-        if (!f)
-        {
+        if (!f) {
             printf("Could not open file: %s\n", FileName);
             return 0L;
         }
@@ -169,31 +139,24 @@ CTRXFirstFile(void *Ref, memptr_t Ptr)
         return fsize;
     };
     Entry->Size = GetFileSize(Entry->FileName);
-    ReturnFirstFile = (int)FFInfoPtr->Entry;
+    ReturnFirstFile = FFInfoPtr->Entry;
 }
 
-static u32
-CTRXFirstFileReturn(void *Ref, u32 Address)
-{
+static u32 CTRXFirstFileReturn(void *Ref, u32 Address) {
     return ReturnFirstFile;
 }
 
 static u32 InterruptMask;
 
-static void
-CTRXInterruptRegisterWrite(void *Ref, u32 Value)
-{
+static void CTRXInterruptRegisterWrite(void *Ref, u32 Value) {
     InterruptMask = Value;
 }
 
-static u32
-CTRXInterruptRegisterRead(void *Ref, u32 Address)
-{
+static u32 CTRXInterruptRegisterRead(void *Ref, u32 Address) {
     return InterruptMask;
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
     InitPlatform(argc, argv);
 
     HsfOpen(&HSF, "puzzle.hsf");
@@ -222,8 +185,7 @@ int main(int argc, char **argv)
     fread(BiosBuffer, fsize, 1, f);
     fclose(f);
 
-    for (int i = 0; i < fsize; ++i)
-    {
+    for (int i = 0; i < fsize; ++i) {
         WriteMemByteRaw(&Cpu, RESET_VECTOR + i, BiosBuffer[i]);
     }
     linearFree(BiosBuffer);
@@ -235,8 +197,7 @@ int main(int argc, char **argv)
     bool EnableDisassembler = false;
     bool AutoStep = true;
     u32 IRQ0Steps = 0;
-    while (MainLoopPlatform())
-    {
+    while (MainLoopPlatform()) {
 #ifdef _3DS
         u32 KeysDown = hidKeysDown();
 
@@ -244,20 +205,17 @@ int main(int argc, char **argv)
             break;
 #endif
 
-        if (Step || AutoStep)
-        {
+        if (Step || AutoStep) {
             StepCpu(&Cpu, CyclesToRun);
             IRQ0Steps += CyclesToRun;
-            if (IRQ0Steps >= 50000)
-            {
+            if (IRQ0Steps >= 50000) {
                 C0GenerateException(&Cpu, C0_CAUSE_INT, Cpu.pc - 4);
                 IRQ0Steps = 0;
                 InterruptMask |= 1;
             }
         }
 
-        if (EnableDisassembler)
-        {
+        if (EnableDisassembler) {
             printf("\x1b[0;0H");
             DisassemblerPrintRange(&Cpu, Cpu.pc - (13 * 4), 29, Cpu.pc);
         }

@@ -16,9 +16,7 @@
 
 static void *GfxHandle;
 
-void
-InitPlatform(int argc, char **argv)
-{
+void InitPlatform(int argc, char **argv) {
     sdmcInit();
     if (argc > 1) chdir(argv[1]);
     gfxInitDefault();
@@ -29,92 +27,72 @@ InitPlatform(int argc, char **argv)
     gfxMakeCurrent(GfxHandle);
 }
 
-void
-ExitPlatform()
-{
+void ExitPlatform() {
     gfxExit();
     hidExit();
     sdmcExit();
 }
 
-void
-SwapBuffersPlatform()
-{
+void SwapBuffersPlatform() {
     gfxFlush(gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL));
     gfxSwapBuffersGpu();
     hidScanInput();
 }
 
-bool
-MainLoopPlatform()
-{
+bool MainLoopPlatform() {
     return aptMainLoop();
 }
 
-u32
-GetDigitalSwitchesPlatform()
-{
+u32 GetDigitalSwitchesPlatform() {
     u32 Value;
     Value = 0xFFFFFFFF;
 
     u32 KeysHeld = hidKeysHeld() | hidKeysDown();
-    if (KeysHeld & KEY_A)
-    {
+    if (KeysHeld & KEY_A) {
         Value &= ~JOY_BUTTON_CIRCLE;
     }
 
-    if (KeysHeld & KEY_B)
-    {
+    if (KeysHeld & KEY_B) {
         Value &= ~JOY_BUTTON_CROSS;
     }
 
-    if (KeysHeld & KEY_SELECT)
-    {
+    if (KeysHeld & KEY_SELECT) {
         Value &= ~JOY_BUTTON_SELECT;
     }
 
-    if (KeysHeld & KEY_START)
-    {
+    if (KeysHeld & KEY_START) {
         Value &= ~JOY_BUTTON_START;
     }
 
-    if (KeysHeld & KEY_DRIGHT)
-    {
+    if (KeysHeld & KEY_DRIGHT) {
         Value &= ~JOY_BUTTON_RIGHT;
     }
 
-    if (KeysHeld & KEY_DLEFT)
-    {
+    if (KeysHeld & KEY_DLEFT) {
         Value &= ~JOY_BUTTON_LEFT;
     }
 
-    if (KeysHeld & KEY_DUP)
-    {
+    if (KeysHeld & KEY_DUP) {
         Value &= ~JOY_BUTTON_UP;
     }
 
-    if (KeysHeld & KEY_DDOWN)
-    {
+    if (KeysHeld & KEY_DDOWN) {
         Value &= ~JOY_BUTTON_DOWN;
     }
 
-    if (KeysHeld & KEY_R)
-    {
+    if (KeysHeld & KEY_R) {
         Value &= ~JOY_BUTTON_R1;
     }
 
-    if (KeysHeld & KEY_L)
-    {
+    if (KeysHeld & KEY_L) {
         Value &= ~JOY_BUTTON_L1;
     }
 
-    if (KeysHeld & KEY_ZL)
-    {
+    if (KeysHeld & KEY_ZL) {
         Value &= ~JOY_BUTTON_L2;
     }
 
-    if (KeysHeld & KEY_ZR)
-    {
+    if (KeysHeld & KEY_ZR) {
         Value &= ~JOY_BUTTON_R2;
     }
     return Value;
@@ -125,10 +103,9 @@ GetDigitalSwitchesPlatform()
 
 static GLFWwindow *GfxHandle;
 
-void
-InitPlatform(int argc, char **argv)
-{
+void InitPlatform(int argc, char **argv) {
     if (argc > 1) chdir(argv[1]);
+
     glfwInit();
 
     glfwWindowHint(GLFW_DOUBLEBUFFER, false);
@@ -137,36 +114,50 @@ InitPlatform(int argc, char **argv)
     glfwSwapInterval(0);
 }
 
-void
-SwapBuffersPlatform()
-{
+void SwapBuffersPlatform() {
     glFlush();
     glfwSwapBuffers(GfxHandle);
     glfwPollEvents();
 }
 
-bool
-MainLoopPlatform()
-{
+bool MainLoopPlatform() {
     return !glfwWindowShouldClose(GfxHandle);
 }
 
-void
-ExitPlatform()
-{
+void ExitPlatform() {
     glfwTerminate();
 }
 
-u32
-GetDigitalSwitchesPlatform()
-{
-    u32 Value;
-    Value = 0xFFFFFFFF;
+u32 GetDigitalSwitchesPlatform() {
+    u32 Value = 0xFFFFFFFF;
     int count;
     const unsigned char* States = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &count);
-    for (int i = 0; i < count && i < 15; ++i)
-    {
+    for (int i = 0; i < count && i < 15; ++i) {
         Value &= ~((States[i] == GLFW_PRESS) << i);
+    }
+
+    if (glfwGetKey(GfxHandle, GLFW_KEY_UP) == GLFW_PRESS) {
+        Value &= ~JOY_BUTTON_UP;
+    }
+
+    if (glfwGetKey(GfxHandle, GLFW_KEY_DOWN) == GLFW_PRESS) {
+        Value &= ~JOY_BUTTON_DOWN;
+    }
+
+    if (glfwGetKey(GfxHandle, GLFW_KEY_LEFT) == GLFW_PRESS) {
+        Value &= ~JOY_BUTTON_LEFT;
+    }
+
+    if (glfwGetKey(GfxHandle, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+        Value &= ~JOY_BUTTON_RIGHT;
+    }
+
+    if (glfwGetKey(GfxHandle, GLFW_KEY_X) == GLFW_PRESS) {
+        Value &= ~JOY_BUTTON_CROSS;
+    }
+
+    if (glfwGetKey(GfxHandle, GLFW_KEY_O) == GLFW_PRESS) {
+        Value &= ~JOY_BUTTON_CIRCLE;
     }
     return Value;
 }
