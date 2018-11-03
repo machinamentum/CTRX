@@ -9,8 +9,6 @@
 #include "gpu.h"
 #include "platform.h"
 
-#include <stdio.h>
-
 static void
 GteExecuteOperation(Coprocessor *Cp, u32 FunctionCode)
 {
@@ -195,7 +193,7 @@ GpuGp0(void *Object, u32 Value)
             break;
 
         default:
-            printf("GP0 0x%08lX\n", Value);
+            logprint("GP0 0x%08lX\n", Value);
             break;
     }
 }
@@ -227,7 +225,7 @@ GpuGp1(void *Object, u32 Value)
             break;
 
         default:
-            printf("GP1 0x%08lX\n", Value);
+            logprint("GP1 0x%08lX\n", Value);
             break;
     }
 

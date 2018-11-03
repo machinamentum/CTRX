@@ -17,6 +17,15 @@
 #include "joypad.h"
 #include "hsf.h"
 
+
+#include <stdarg.h>
+void logprint(const char *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    vprintf(fmt, args);
+    va_end(args);
+}
+
 void ResetCpu(MIPS_R3000 *Cpu) {
     Cpu->pc = RESET_VECTOR;
 }
@@ -159,7 +168,18 @@ static u32 CTRXInterruptRegisterRead(void *Ref, u32 Address) {
 int main(int argc, char **argv) {
     InitPlatform(argc, argv);
 
-    HsfOpen(&HSF, "puzzle.hsf");
+#ifndef _3DS
+    if (argc < 2) {
+        printf("Usage: %s <filename>.hsf\n", argv[0]);
+        return -1;
+    }
+#endif
+    HsfOpen(&HSF, argv[1]);
+
+    if (!HSF.PVD) {
+        printf("Could not open file: '%s'\n", argv[1]);
+        return -1;
+    }
 
     MIPS_R3000 Cpu;
     GPU Gpu;
@@ -177,6 +197,10 @@ int main(int argc, char **argv) {
     MapRegister(&Cpu, (mmr) {0x1F801070, nullptr, CTRXInterruptRegisterWrite, empty_ret});
 
     FILE *f = fopen("psx_bios.bin", "rb");
+    if (!f) {
+        logprint("Could not find psx_bios.bin! Aborting!\n");
+        return -1;
+    }
     fseek(f, 0, SEEK_END);
     long fsize = ftell(f);
     fseek(f, 0, SEEK_SET);

@@ -8,38 +8,26 @@
  */
 #include "kernel.h"
 
-void
-InitPad(void *Buf1, int Siz1, void *Buf2, int Siz2)
-{
+void InitPad(void *Buf1, int Siz1, void *Buf2, int Siz2) {
     printf("%s\n", __FUNCTION__);
 }
 
-void
-StartPad()
-{
+void StartPad() {
     printf("%s\n", __FUNCTION__);
 }
 
-void
-StopPad()
-{
+void StopPad() {
     printf("%s\n", __FUNCTION__);
 }
 
-void
-OutdatedPadInitAndStart(int Type, void *ButtonDst, int Unk2, int Unk3)
-{
+void OutdatedPadInitAndStart(int Type, void *ButtonDst, int Unk2, int Unk3) {
     printf("%s\n", __FUNCTION__);
 }
 
-void
-OutdatedPadGetButtons()
-{
+void OutdatedPadGetButtons() {
     printf("%s\n", __FUNCTION__);
 }
 
-void
-ChangeClearPad(int Clear)
-{
+void ChangeClearPad(int Clear) {
     printf("%s\n", __FUNCTION__);
 }

@@ -40,5 +40,6 @@ void ExitPlatform();
 void SwapBuffersPlatform();
 bool MainLoopPlatform();
 u32 GetDigitalSwitchesPlatform();
+void logprint(const char *fmt, ...);
 
 #endif
